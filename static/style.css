@@ -1,0 +1,41 @@
+body { 
+    font-family: Arial; 
+    text-align: center; 
+    background: #f0f0f0; 
+}
+
+.container { 
+    display: inline-block; 
+    margin-top: 50px; 
+}
+
+.grid { 
+    border-collapse: collapse; 
+    margin: 0 auto; 
+}
+
+.grid td { 
+    width: 60px; 
+    height: 60px; 
+    border: 2px solid #333; 
+    border-radius: 50%; 
+    background: white; 
+}
+
+.p1 { 
+    background-color: red; 
+}
+
+.p2 { 
+    background-color: yellow; 
+}
+
+.empty { 
+    background-color: white; 
+}
+
+button { 
+    width: 60px; 
+    height: 30px; 
+    margin: 2px; 
+}

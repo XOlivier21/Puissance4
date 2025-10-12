@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Puissance 4</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        body { font-family: Arial; text-align: center; background: #f0f0f0; }
+        .container { display: inline-block; margin-top: 50px; }
+        .grid { border-collapse: collapse; margin: 0 auto; }
+        .grid td { width: 60px; height: 60px; border: 2px solid #333; border-radius: 50%; background: white; transition: background 0.2s; }
+        .p1 { background-color: red; }
+        .p2 { background-color: yellow; }
+        .empty { background-color: white; }
+        .buttons button { width: 60px; height: 30px; margin: 2px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Puissance 4</h1>
+
+        <p>
+            Tour du joueur :
+            {{if eq .CurrentTurn 1}}
+                <span class="player1">Rouge</span>
+            {{else}}
+                <span class="player2">Jaune</span>
+            {{end}}
+        </p>
+
+        <div class="buttons">
+            {{range $i, $_ := index .Grid 0}}
+                <button data-column="{{$i}}">↓</button>
+            {{end}}
+        </div>
+
+        <table class="grid">
+            {{range $i, $row := .Grid}}
+                <tr>
+                    {{range $j, $cell := $row}}
+                        <td id="cell-{{$i}}-{{$j}}" class="{{if eq $cell 1}}p1{{else if eq $cell 2}}p2{{else}}empty{{end}}"></td>
+                    {{end}}
+                </tr>
+            {{end}}
+        </table>
+
+        {{if .GameOver}}
+            <h2>
+                {{if eq .Winner 0}}Match nul !
+                {{else if eq .Winner 1}}Joueur Rouge a gagné !
+                {{else}}Joueur Jaune a gagné !
+                {{end}}
+            </h2>
+            <form method="GET" action="/reset">
+                <button type="submit">Recommencer</button>
+            </form>
+        {{end}}
+    </div>
+
+    <script>
+        const buttons = document.querySelectorAll(".buttons button");
+
+        buttons.forEach(btn => {
+            btn.addEventListener("click", async () => {
+                const col = btn.dataset.column;
+
+                // Envoie le coup au serveur
+                await fetch("/play", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: `column=${col}`
+                });
+
+                // Récupère la grille mise à jour
+                const resp = await fetch("/");
+                const text = await resp.text();
+
+                // Met à jour la grille dans le DOM
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(text, "text/html");
+                const newCells = doc.querySelectorAll(".grid td");
+                const oldCells = document.querySelectorAll(".grid td");
+
+                oldCells.forEach((cell, i) => {
+                    cell.className = newCells[i].className;
+                });
+            });
+        });
+    </script>
+</body>
+</html>
