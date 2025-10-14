@@ -1,12 +1,20 @@
 package main
 
-import "net/http"
+import (
+    "log"
+    "net/http"
+)
 
 func main() {
-    http.HandleFunc("/", handleIndex)
-    http.HandleFunc("/play", handlePlay)
-    http.HandleFunc("/reset", handleReset)
-    http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+    // Routes principales
+    http.HandleFunc("/", gestionnaireIndex)
+    http.HandleFunc("/deposer", gestionnaireDeposer)
+    http.HandleFunc("/reinitialiser", gestionnaireReinitialiser)
 
-    http.ListenAndServe(":8080", nil)
+    // Fichiers statiques (CSS)
+    fs := http.FileServer(http.Dir("static"))
+    http.Handle("/static/", http.StripPrefix("/static/", fs))
+
+    log.Println("Serveur démarre sur http://localhost:8080")
+    log.Fatal(http.ListenAndServe(":8080", nil))
 }

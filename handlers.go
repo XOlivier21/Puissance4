@@ -2,52 +2,61 @@ package main
 
 import (
     "html/template"
+    "log"
     "net/http"
     "strconv"
 )
 
-var tmpl = template.Must(template.ParseFiles("templates/index.html"))
-var game = NewGame()
-
-type TemplateData struct {
-    Grid        [6][7]int
-    CurrentTurn int
-    GameOver    bool
-    Winner      int
-}
-
-func convertGame(g *Game) TemplateData {
-    var data TemplateData
-    data.CurrentTurn = int(g.CurrentTurn)
-    data.GameOver = g.GameOver
-    data.Winner = int(g.Winner)
-
-    for i := 0; i < 6; i++ {
-        for j := 0; j < 7; j++ {
-            data.Grid[i][j] = int(g.Grid[i][j])
+var jeuActuel = NouveauJeu()
+var tmpl = template.Must(template.New("").Funcs(template.FuncMap{
+    "Sequence": func(n int) []int {
+        result := make([]int, n)
+        for i := 0; i < n; i++ {
+            result[i] = i
         }
+        return result
+    },
+    "add": func(a, b int) int {
+        return a + b
+    },
+}).ParseFiles("templates/index.html"))
+
+func gestionnaireIndex(w http.ResponseWriter, r *http.Request) {
+    if r.Method != http.MethodGet {
+        http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
+        return
     }
-    return data
+
+    err := tmpl.ExecuteTemplate(w, "index.html", jeuActuel)
+    if err != nil {
+        log.Println("Erreur de template:", err)
+        http.Error(w, "Erreur interne", http.StatusInternalServerError)
+    }
 }
 
-func handleIndex(w http.ResponseWriter, r *http.Request) {
-    data := convertGame(game)
-    tmpl.Execute(w, data)
-}
+func gestionnaireDeposer(w http.ResponseWriter, r *http.Request) {
+    if r.Method != http.MethodPost {
+        http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
+        return
+    }
 
-func handlePlay(w http.ResponseWriter, r *http.Request) {
-    if r.Method != http.MethodPost || game.GameOver {
+    colonneStr := r.FormValue("colonne")
+    colonne, err := strconv.Atoi(colonneStr)
+    if err != nil {
         http.Redirect(w, r, "/", http.StatusSeeOther)
         return
     }
-    col, err := strconv.Atoi(r.FormValue("column"))
-    if err == nil {
-        game.Play(col)
-    }
+
+    jeuActuel.DeposerPion(colonne)
     http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-func handleReset(w http.ResponseWriter, r *http.Request) {
-    game = NewGame()
+func gestionnaireReinitialiser(w http.ResponseWriter, r *http.Request) {
+    if r.Method != http.MethodPost {
+        http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
+        return
+    }
+
+    jeuActuel.Reinitialiser()
     http.Redirect(w, r, "/", http.StatusSeeOther)
 }
