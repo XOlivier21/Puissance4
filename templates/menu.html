@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puissance 4 - Menu</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="conteneur menu-conteneur">
+        <h1>Puissance 4</h1>
+        
+        <div class="menu-options">
+            <h2>Choisissez votre mode de jeu</h2>
+            
+            <form method="POST" action="/nouvelle-partie" class="mode-form">
+                <input type="hidden" name="mode" value="normal">
+                <button type="submit" class="bouton-mode bouton-normal">
+                    <div class="mode-titre">Mode Normal</div>
+                    <div class="mode-description">Puissance 4 classique</div>
+                </button>
+            </form>
+
+            <form method="POST" action="/nouvelle-partie" class="mode-form">
+                <input type="hidden" name="mode" value="pouvoirs">
+                <button type="submit" class="bouton-mode bouton-pouvoirs">
+                    <div class="mode-titre">Mode Pouvoirs</div>
+                    <div class="mode-description">
+                        Avec des pouvoirs speciaux !
+                        <br>Bombe • Double pion • Annulation
+                    </div>
+                </button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

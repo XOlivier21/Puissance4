@@ -22,6 +22,23 @@
             {{end}}
         </div>
 
+        {{if .ModePouvoirs}}
+        <div class="pouvoirs-container">
+            <div class="pouvoirs-joueur {{if eq .JoueurActuel 1}}actif{{end}}">
+                <h3>Joueur 1</h3>
+                <div class="pouvoir-item">Bombe: {{index .PouvoisJ1 1}}</div>
+                <div class="pouvoir-item">Double: {{index .PouvoisJ1 2}}</div>
+                <div class="pouvoir-item">Annulation: {{index .PouvoisJ1 3}}</div>
+            </div>
+            <div class="pouvoirs-joueur {{if eq .JoueurActuel 2}}actif{{end}}">
+                <h3>Joueur 2</h3>
+                <div class="pouvoir-item">Bombe: {{index .PouvoisJ2 1}}</div>
+                <div class="pouvoir-item">Double: {{index .PouvoisJ2 2}}</div>
+                <div class="pouvoir-item">Annulation: {{index .PouvoisJ2 3}}</div>
+            </div>
+        </div>
+        {{end}}
+
         <div class="plateau">
             {{range $ligneIdx, $ligne := .Plateau}}
                 <div class="ligne">
@@ -45,11 +62,73 @@
             </form>
             {{end}}
         </div>
+
+        {{if .ModePouvoirs}}
+        <div class="pouvoirs-actions">
+            <h3>Utiliser un pouvoir :</h3>
+            
+            <div class="pouvoir-controls">
+                <div class="pouvoir-section">
+                    <label>Bombe (détruit zone 3x3)</label>
+                    <div class="pouvoir-inputs">
+                        <input type="number" id="colonneBombe" min="0" max="6" placeholder="Colonne">
+                        <button onclick="utiliserPouvoir(1)" class="bouton-pouvoir">Utiliser</button>
+                    </div>
+                </div>
+
+                <div class="pouvoir-section">
+                    <label>Double pion</label>
+                    <div class="pouvoir-inputs">
+                        <input type="number" id="colonneDouble" min="0" max="6" placeholder="Colonne">
+                        <button onclick="utiliserPouvoir(2)" class="bouton-pouvoir">Utiliser</button>
+                    </div>
+                </div>
+
+                <div class="pouvoir-section">
+                    <label>Annulation (2 derniers coups)</label>
+                    <div class="pouvoir-inputs">
+                        <button onclick="utiliserPouvoir(3)" class="bouton-pouvoir">Utiliser</button>
+                    </div>
+                </div>
+            </div>
+
+            <form id="pouvoirForm" method="POST" action="/pouvoir" style="display: none;">
+                <input type="hidden" name="pouvoir" id="pouvoirType">
+                <input type="hidden" name="colonne" id="pouvoirColonne">
+            </form>
+
+            <script>
+                function utiliserPouvoir(type) {
+                    let colonne = '';
+                    if (type === 1) {
+                        colonne = document.getElementById('colonneBombe').value;
+                    } else if (type === 2) {
+                        colonne = document.getElementById('colonneDouble').value;
+                    }
+                    
+                    if ((type === 1 || type === 2) && !colonne) {
+                        alert('Veuillez choisir une colonne');
+                        return;
+                    }
+                    
+                    document.getElementById('pouvoirType').value = type;
+                    document.getElementById('pouvoirColonne').value = colonne;
+                    document.getElementById('pouvoirForm').submit();
+                }
+            </script>
+        </div>
+        {{end}}
         {{end}}
 
-        <form method="POST" action="/reinitialiser">
-            <button type="submit" class="bouton-reinitialiser">Nouvelle Partie</button>
-        </form>
+        <div class="boutons-actions">
+            <form method="POST" action="/reinitialiser" style="display: inline;">
+                <button type="submit" class="bouton-reinitialiser">Nouvelle Partie</button>
+            </form>
+            
+            <form method="POST" action="/menu" style="display: inline;">
+                <button type="submit" class="bouton-menu">Retour au Menu</button>
+            </form>
+        </div>
     </div>
 </body>
 </html>
