@@ -13,24 +13,66 @@
         <div class="menu-options">
             <h2>Choisissez votre mode de jeu</h2>
             
+            <!-- Mode Normal -->
             <form method="POST" action="/nouvelle-partie" class="mode-form">
                 <input type="hidden" name="mode" value="normal">
                 <button type="submit" class="bouton-mode bouton-normal">
                     <div class="mode-titre">Mode Normal</div>
-                    <div class="mode-description">Puissance 4 classique</div>
+                    <div class="mode-description">Puissance 4 classique - 2 joueurs</div>
                 </button>
             </form>
 
+            <!-- Mode Pouvoirs -->
             <form method="POST" action="/nouvelle-partie" class="mode-form">
                 <input type="hidden" name="mode" value="pouvoirs">
                 <button type="submit" class="bouton-mode bouton-pouvoirs">
                     <div class="mode-titre">Mode Pouvoirs</div>
                     <div class="mode-description">
-                        Avec des pouvoirs speciaux !
-                        <br>Bombe • Double pion • Annulation
+                        Avec des pouvoirs speciaux - 2 joueurs
+                        <br>💣 Bombe • ⚡ Double pion • ↩️ Annulation
                     </div>
                 </button>
             </form>
+
+            <!-- Mode IA -->
+            <div class="mode-ia-section">
+                <h3>Versus IA</h3>
+                
+                <form method="POST" action="/nouvelle-partie" class="mode-form">
+                    <input type="hidden" name="mode" value="ia">
+                    <div class="niveau-selection">
+                        <label>Niveau de difficulté :</label>
+                        <select name="niveau" class="select-niveau">
+                            <option value="1">Facile</option>
+                            <option value="2" selected>Moyen</option>
+                            <option value="3">Difficile</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="bouton-mode bouton-ia">
+                        <div class="mode-titre">🤖 Mode Normal vs IA</div>
+                        <div class="mode-description">Affrontez l'ordinateur</div>
+                    </button>
+                </form>
+
+                <form method="POST" action="/nouvelle-partie" class="mode-form">
+                    <input type="hidden" name="mode" value="ia-pouvoirs">
+                    <div class="niveau-selection">
+                        <label>Niveau de difficulté :</label>
+                        <select name="niveau" class="select-niveau">
+                            <option value="1">Facile</option>
+                            <option value="2" selected>Moyen</option>
+                            <option value="3">Difficile</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="bouton-mode bouton-ia-pouvoirs">
+                        <div class="mode-titre">🤖 Mode Pouvoirs vs IA</div>
+                        <div class="mode-description">
+                            IA avec pouvoirs speciaux
+                            <br>💣 Bombe • ⚡ Double pion • ↩️ Annulation
+                        </div>
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </body>

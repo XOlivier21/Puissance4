@@ -13,9 +13,9 @@ const (
 // Types de pouvoirs
 const (
     PouvoirAucun       = 0
-    PouvoirBombe       = 1 // Détruit les pions adjacents
-    PouvoirDouble      = 2 // Place 2 pions
-    PouvoirAnnulation  = 3 // Annule le dernier coup
+    PouvoirBombe       = 1
+    PouvoirDouble      = 2
+    PouvoirAnnulation  = 3
 )
 
 type Jeu struct {
@@ -24,7 +24,10 @@ type Jeu struct {
     Gagnant        int
     PartieTerminee bool
     ModePouvoirs   bool
-    PouvoisJ1      map[int]int // Type pouvoir -> nombre restant
+    ModeIA         bool
+    NiveauIA       int
+    IA             *IA
+    PouvoisJ1      map[int]int
     PouvoisJ2      map[int]int
     Historique     []struct {
         Ligne   int
@@ -38,6 +41,7 @@ func NouveauJeu(modePouvoirs bool) *Jeu {
     jeu := &Jeu{
         JoueurActuel: Joueur1,
         ModePouvoirs: modePouvoirs,
+        ModeIA:       false,
     }
     
     if modePouvoirs {
@@ -53,6 +57,14 @@ func NouveauJeu(modePouvoirs bool) *Jeu {
         }
     }
     
+    return jeu
+}
+
+func NouveauJeuIA(modePouvoirs bool, niveauIA int) *Jeu {
+    jeu := NouveauJeu(modePouvoirs)
+    jeu.ModeIA = true
+    jeu.NiveauIA = niveauIA
+    jeu.IA = NouvelleIA(niveauIA)
     return jeu
 }
 

@@ -7,13 +7,14 @@ import (
 
 func main() {
     // Routes principales
-    http.HandleFunc("/", gestionnaireMenu)
-    http.HandleFunc("/nouvelle-partie", gestionnaireNouvellePartie)
-    http.HandleFunc("/jeu", gestionnaireIndex)
-    http.HandleFunc("/deposer", gestionnaireDeposer)
-    http.HandleFunc("/pouvoir", gestionnairePouvoir)
-    http.HandleFunc("/reinitialiser", gestionnaireReinitialiser)
-    http.HandleFunc("/menu", gestionnaireRetourMenu)
+    http.HandleFunc("/", GestionnaireMenu)
+    http.HandleFunc("/nouvelle-partie", GestionnaireNouvellePartie)
+    http.HandleFunc("/jeu", GestionnaireIndex)
+    http.HandleFunc("/deposer", GestionnaireDeposer)
+    http.HandleFunc("/api/deposer", GestionnaireDeposerAPI) // Nouvelle route API
+    http.HandleFunc("/pouvoir", GestionnairePouvoir)
+    http.HandleFunc("/reinitialiser", GestionnaireReinitialiser)
+    http.HandleFunc("/menu", GestionnaireRetourMenu)
 
     // Fichiers statiques (CSS)
     fs := http.FileServer(http.Dir("static"))
