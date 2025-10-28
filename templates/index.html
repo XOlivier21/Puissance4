@@ -10,55 +10,43 @@
     <div class="conteneur">
         <h1>Puissance 4</h1>
         
-        <div class="statut" id="statut">
+    <div id="statut" class="statut">
             {{if .PartieTerminee}}
                 {{if .Gagnant}}
-                    {{if and .ModeIA (eq .Gagnant 2)}}
-                        <span class="victoire">IA a gagné !</span>
-                    {{else if and .ModeIA (eq .Gagnant 1)}}
-                        <span class="victoire">Vous avez gagné !</span>
-                    {{else}}
-                        <span class="victoire">Joueur {{.Gagnant}} a gagné !</span>
-                    {{end}}
+                    <span class="victoire">Joueur {{.Gagnant}} a gagne !</span>
                 {{else}}
                     <span class="nul">Match nul !</span>
                 {{end}}
             {{else}}
-                {{if and .ModeIA (eq .JoueurActuel 2)}}
-                    <span>Tour de l'IA...</span>
-                {{else if .ModeIA}}
-                    <span>Votre tour</span>
-                {{else}}
-                    <span>Tour du Joueur {{.JoueurActuel}}</span>
-                {{end}}
+                <span>Tour du Joueur {{.JoueurActuel}}</span>
             {{end}}
         </div>
 
         {{if .ModePouvoirs}}
         <div class="pouvoirs-container">
-            <div class="pouvoirs-joueur {{if eq .JoueurActuel 1}}actif{{end}}" id="pouvoirs-j1">
-                <h3>{{if .ModeIA}}Vous{{else}}Joueur 1{{end}}</h3>
-                <div class="pouvoir-item">💣 Bombe: <span id="bombe-j1">{{index .PouvoisJ1 1}}</span></div>
-                <div class="pouvoir-item">⚡ Double: <span id="double-j1">{{index .PouvoisJ1 2}}</span></div>
-                <div class="pouvoir-item">↩️ Annulation: <span id="annul-j1">{{index .PouvoisJ1 3}}</span></div>
+            <div class="pouvoirs-joueur {{if eq .JoueurActuel 1}}actif{{end}}">
+                <h3>Joueur 1</h3>
+                <div class="pouvoir-item">Bombe: {{index .PouvoisJ1 1}}</div>
+                <div class="pouvoir-item">Double: {{index .PouvoisJ1 2}}</div>
+                <div class="pouvoir-item">Annulation: {{index .PouvoisJ1 3}}</div>
             </div>
-            <div class="pouvoirs-joueur {{if eq .JoueurActuel 2}}actif{{end}}" id="pouvoirs-j2">
-                <h3>{{if .ModeIA}}IA{{else}}Joueur 2{{end}}</h3>
-                <div class="pouvoir-item">💣 Bombe: <span id="bombe-j2">{{index .PouvoisJ2 1}}</span></div>
-                <div class="pouvoir-item">⚡ Double: <span id="double-j2">{{index .PouvoisJ2 2}}</span></div>
-                <div class="pouvoir-item">↩️ Annulation: <span id="annul-j2">{{index .PouvoisJ2 3}}</span></div>
+            <div class="pouvoirs-joueur {{if eq .JoueurActuel 2}}actif{{end}}">
+                <h3>Joueur 2</h3>
+                <div class="pouvoir-item">Bombe: {{index .PouvoisJ2 1}}</div>
+                <div class="pouvoir-item">Double: {{index .PouvoisJ2 2}}</div>
+                <div class="pouvoir-item">Annulation: {{index .PouvoisJ2 3}}</div>
             </div>
         </div>
         {{end}}
 
-        <div class="plateau" id="plateau">
+    <div id="plateau" class="plateau">
             {{range $ligneIdx, $ligne := .Plateau}}
                 <div class="ligne">
                     {{range $colIdx, $valeur := $ligne}}
                         <div class="cellule 
                             {{if eq $valeur 1}}joueur1
                             {{else if eq $valeur 2}}joueur2
-                            {{end}}" data-ligne="{{$ligneIdx}}" data-col="{{$colIdx}}">
+                            {{end}}">
                         </div>
                     {{end}}
                 </div>
@@ -66,9 +54,12 @@
         </div>
 
         {{if not .PartieTerminee}}
-        <div class="boutons-colonnes">
+        <div id="boutons-colonnes" class="boutons-colonnes">
             {{range $i := Sequence 7}}
-            <button type="button" class="bouton-colonne" onclick="jouerCoup({{$i}})">↓</button>
+            <form method="POST" action="/deposer" class="formulaire-colonne">
+                <input type="hidden" name="colonne" value="{{$i}}">
+                <button type="submit" class="bouton-colonne">↓</button>
+            </form>
             {{end}}
         </div>
 
@@ -105,144 +96,108 @@
                 <input type="hidden" name="pouvoir" id="pouvoirType">
                 <input type="hidden" name="colonne" id="pouvoirColonne">
             </form>
+
+            <script>
+                function utiliserPouvoir(type) {
+                    let colonne = '';
+                    if (type === 1) {
+                        colonne = document.getElementById('colonneBombe').value;
+                    } else if (type === 2) {
+                        colonne = document.getElementById('colonneDouble').value;
+                    }
+                    
+                    if ((type === 1 || type === 2) && !colonne) {
+                        alert('Veuillez choisir une colonne');
+                        return;
+                    }
+                    
+                    document.getElementById('pouvoirType').value = type;
+                    document.getElementById('pouvoirColonne').value = colonne;
+                    document.getElementById('pouvoirForm').submit();
+                }
+            </script>
         </div>
         {{end}}
         {{end}}
 
         <div class="boutons-actions">
-            <form method="POST" action="/reinitialiser" style="display: inline;">
+            <form id="formReinit" method="POST" action="/reinitialiser" style="display: inline;">
                 <button type="submit" class="bouton-reinitialiser">Nouvelle Partie</button>
             </form>
             
-            <form method="POST" action="/menu" style="display: inline;">
+            <form id="formMenu" method="POST" action="/menu" style="display: inline;">
                 <button type="submit" class="bouton-menu">Retour au Menu</button>
             </form>
         </div>
-    </div>
-
+    
     <script>
-        const modeIA = {{.ModeIA}};
-        const modePouvoirs = {{.ModePouvoirs}};
-        let partieTerminee = {{.PartieTerminee}};
+        // Helper pour re-render le plateau et le statut à partir de l'état renvoyé par l'API
+        function renderState(state) {
+            // statut
+            const statutEl = document.getElementById('statut');
+            if (state.partieTerminee) {
+                if (state.gagnant) {
+                    statutEl.innerHTML = `<span class="victoire">Joueur ${state.gagnant} a gagne !</span>`;
+                } else {
+                    statutEl.innerHTML = `<span class="nul">Match nul !</span>`;
+                }
+            } else {
+                statutEl.innerHTML = `<span>Tour du Joueur ${state.joueurActuel}</span>`;
+            }
 
-        async function jouerCoup(colonne) {
-            if (partieTerminee) return;
+            // plateau
+            const plateauEl = document.getElementById('plateau');
+            let html = '';
+            for (let i = 0; i < state.plateau.length; i++) {
+                html += '<div class="ligne">';
+                for (let j = 0; j < state.plateau[i].length; j++) {
+                    const val = state.plateau[i][j];
+                    let classes = 'cellule ';
+                    if (val === 1) classes += 'joueur1';
+                    else if (val === 2) classes += 'joueur2';
+                    html += `<div class="${classes}"></div>`;
+                }
+                html += '</div>';
+            }
+            plateauEl.innerHTML = html;
 
-            try {
-                const formData = new FormData();
-                formData.append('colonne', colonne);
+            // désactiver boutons si partie terminée
+            const forms = document.querySelectorAll('.formulaire-colonne');
+            forms.forEach(f => {
+                const btn = f.querySelector('button');
+                if (state.partieTerminee) {
+                    btn.disabled = true;
+                } else {
+                    btn.disabled = false;
+                }
+            });
+        }
 
-                const response = await fetch('/api/deposer', {
+        // Interception des formulaires de colonnes pour envoyer via fetch
+        document.querySelectorAll('.formulaire-colonne').forEach(f => {
+            f.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const col = parseInt(f.querySelector('input[name="colonne"]').value, 10);
+                fetch('/api/deposer', {
                     method: 'POST',
-                    body: formData
-                });
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ colonne: col })
+                }).then(r => r.json()).then(state => {
+                    renderState(state);
+                }).catch(err => console.error(err));
+            });
+        });
 
-                const data = await response.json();
-                
-                if (data.success) {
-                    mettreAJourPlateau(data.plateau);
-                    mettreAJourStatut(data);
-                    
-                    if (modePouvoirs) {
-                        mettreAJourPouvoirs(data);
-                    }
-                    
-                    partieTerminee = data.partieTerminee;
-                }
-            } catch (error) {
-                console.error('Erreur:', error);
-            }
-        }
+        // Interception réinitialiser pour utiliser l'API (évite reload)
+        document.getElementById('formReinit').addEventListener('submit', function(e) {
+            e.preventDefault();
+            fetch('/api/reinitialiser', { method: 'POST' }).then(r => r.json()).then(state => {
+                renderState(state);
+            }).catch(err => console.error(err));
+        });
 
-        function mettreAJourPlateau(plateau) {
-            const cellules = document.querySelectorAll('.cellule');
-            let index = 0;
-            
-            for (let ligne = 0; ligne < 6; ligne++) {
-                for (let col = 0; col < 7; col++) {
-                    const cellule = cellules[index];
-                    cellule.className = 'cellule';
-                    
-                    if (plateau[ligne][col] === 1) {
-                        cellule.classList.add('joueur1');
-                    } else if (plateau[ligne][col] === 2) {
-                        cellule.classList.add('joueur2');
-                    }
-                    
-                    index++;
-                }
-            }
-        }
-
-        function mettreAJourStatut(data) {
-            const statut = document.getElementById('statut');
-            
-            if (data.partieTerminee) {
-                if (data.gagnant) {
-                    if (modeIA && data.gagnant === 2) {
-                        statut.innerHTML = '<span class="victoire">IA a gagné !</span>';
-                    } else if (modeIA && data.gagnant === 1) {
-                        statut.innerHTML = '<span class="victoire">Vous avez gagné !</span>';
-                    } else {
-                        statut.innerHTML = `<span class="victoire">Joueur ${data.gagnant} a gagné !</span>`;
-                    }
-                } else {
-                    statut.innerHTML = '<span class="nul">Match nul !</span>';
-                }
-            } else {
-                if (modeIA && data.joueurActuel === 2) {
-                    statut.innerHTML = '<span>Tour de l\'IA...</span>';
-                } else if (modeIA) {
-                    statut.innerHTML = '<span>Votre tour</span>';
-                } else {
-                    statut.innerHTML = `<span>Tour du Joueur ${data.joueurActuel}</span>`;
-                }
-            }
-        }
-
-        function mettreAJourPouvoirs(data) {
-            if (data.pouvoisJ1) {
-                document.getElementById('bombe-j1').textContent = data.pouvoisJ1[1] || 0;
-                document.getElementById('double-j1').textContent = data.pouvoisJ1[2] || 0;
-                document.getElementById('annul-j1').textContent = data.pouvoisJ1[3] || 0;
-            }
-            
-            if (data.pouvoisJ2) {
-                document.getElementById('bombe-j2').textContent = data.pouvoisJ2[1] || 0;
-                document.getElementById('double-j2').textContent = data.pouvoisJ2[2] || 0;
-                document.getElementById('annul-j2').textContent = data.pouvoisJ2[3] || 0;
-            }
-
-            // Mettre à jour les classes actif
-            const pouvoirsJ1 = document.getElementById('pouvoirs-j1');
-            const pouvoirsJ2 = document.getElementById('pouvoirs-j2');
-            
-            if (data.joueurActuel === 1) {
-                pouvoirsJ1.classList.add('actif');
-                pouvoirsJ2.classList.remove('actif');
-            } else {
-                pouvoirsJ1.classList.remove('actif');
-                pouvoirsJ2.classList.add('actif');
-            }
-        }
-
-        function utiliserPouvoir(type) {
-            let colonne = '';
-            if (type === 1) {
-                colonne = document.getElementById('colonneBombe').value;
-            } else if (type === 2) {
-                colonne = document.getElementById('colonneDouble').value;
-            }
-            
-            if ((type === 1 || type === 2) && !colonne) {
-                alert('Veuillez choisir une colonne');
-                return;
-            }
-            
-            document.getElementById('pouvoirType').value = type;
-            document.getElementById('pouvoirColonne').value = colonne;
-            document.getElementById('pouvoirForm').submit();
-        }
+        // Retour au menu : laisser le comportement par défaut (redirige vers /)
     </script>
+    </div>
 </body>
 </html>
